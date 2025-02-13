@@ -5,16 +5,18 @@ import { fontSize, spacing } from '../constants/dimensions'
 import { fontFamily } from '../constants/fonts'
 
 const imageUrl = "https://www.croma.com/apple-watch-se-gps-with-midnight-sport-band-s-m-40mm-retina-ltpo-oled-display-midnight-aluminium-case-/p/309325"
-const ProductCard = () => {
+const ProductCard = ({item}) => {
+  // console.log("item: ", item);
+  
   return (
     <TouchableOpacity style={styles.container}>
         <View style={styles.imageWrapper}>
-          <Image source={require("../assets/watch1.webp")} style={styles.image} />
+          <Image source={{ uri: item.image}} style={styles.image} />
         </View>
         {/* Content like name price  */}
         <View style={styles.contentContainer}>
-           <Text style={styles.name}>Apple Watch Ultra</Text>
-           <Text style={styles.brand}>Apple</Text>
+           <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
+          <Text style={styles.brand}>{item.brand}</Text>
            <Text style={styles.price}>$100</Text>
         </View>
     </TouchableOpacity>
