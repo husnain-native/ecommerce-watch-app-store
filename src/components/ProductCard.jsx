@@ -2,14 +2,18 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { colors } from '../constants/colors'
 import { fontSize, spacing } from '../constants/dimensions'
-import { fontFamily } from '../constants/fonts'
+import { fontFamily } from '../constants/fonts';
+import { useNavigation } from '@react-navigation/native';
 
 const imageUrl = "https://www.croma.com/apple-watch-se-gps-with-midnight-sport-band-s-m-40mm-retina-ltpo-oled-display-midnight-aluminium-case-/p/309325"
 const ProductCard = ({item}) => {
-  // console.log("item: ", item);
+  const navigation = useNavigation();
+  const handleProductDetailsScreen = ()=>{
+    navigation.navigate("PRODUCT_DETAILS", {item})
+  }
   
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={handleProductDetailsScreen}>
         <View style={styles.imageWrapper}>
           <Image source={{ uri: item.image}} style={styles.image} />
         </View>
@@ -17,7 +21,7 @@ const ProductCard = ({item}) => {
         <View style={styles.contentContainer}>
            <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
           <Text style={styles.brand}>{item.brand}</Text>
-           <Text style={styles.price}>$100</Text>
+           <Text style={styles.price}>${item.price}</Text>
         </View>
     </TouchableOpacity>
   )

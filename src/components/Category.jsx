@@ -5,17 +5,14 @@ import { fontFamily } from '../constants/fonts'
 import { colors } from '../constants/colors'
 import { category } from '../data/category'
 
-const Category = () => {
+const Category = ({selectedCategory, handleUpdateCategory}) => {
   // state management
-  const [selectedCategory, setSelectedCategory] = useState("Smart Watch")
-  const handleSelectedCategory = (category) => {
-    setSelectedCategory(category)
-  }
+  
+  
   return (
     <FlatList data={category} 
     renderItem={({item, index})=> (
-      <TouchableOpacity 
-      onPress={() => handleSelectedCategory(item.name)}>
+      <TouchableOpacity onPress={() =>{ handleUpdateCategory(item.name)}}>
       <Text style={[styles.CategoryText, selectedCategory === item.name && {color: colors.purple}]}>{item.name}</Text>
     {selectedCategory === item.name && <View style={styles.underine} />
   }  
