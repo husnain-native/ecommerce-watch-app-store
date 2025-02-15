@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
   },
   textInput:{
     flex: 1,
-    paddingHorizontal: spacing.md,
     fontSize: fontSize.lg,
     fontFamily: fontFamily.Medium,
   },

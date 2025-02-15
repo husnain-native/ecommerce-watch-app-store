@@ -143,7 +143,8 @@ const ProductDetailsScreen = () => {
         </Text>
       </ScrollView>
       {/*add to cart button  */}
-      <CartButton />
+      <CartButton item={item} />
+
     </View>
   );
 };
