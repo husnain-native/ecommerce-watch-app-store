@@ -6,21 +6,28 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useRoute } from "@react-navigation/native";
 
 // icons
+import AntDesign from "react-native-vector-icons/AntDesign";
 
+// Constants
 import { fontSize, iconSize, spacing } from "../constants/dimensions";
+import { colors } from "../constants/colors";
+import { fontFamily } from "../constants/fonts";
+
+// Components
 import Header from "../components/Header";
 import ProductCarousel from "../components/ProductCarousel";
-import { colors } from "../constants/colors";
-
-// icon
-import AntDesign from "react-native-vector-icons/AntDesign";
-import { fontFamily } from "../constants/fonts";
 import CartButton from "../components/CartButton";
 
+// FavoritesContext
+import { FavoritesContext } from "../context/FavoritesContext";
+import { useFavorites } from '../context/FavoritesContext';
+
+
+// Mock Data for Colors
 const colorsData = [
   {
     colorName: "Silver",
@@ -39,112 +46,116 @@ const colorsData = [
 const ProductDetailsScreen = () => {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedTab, setSelectedTab] = useState("Details");
-  const item = useRoute().params.item;
+  const item = useRoute().params.item; // Retrieve item from route params
+  const { addToFavorites, removeFromFavorites, favorites } = useFavorites();; // Access favorites context
+
+  const isFavorite = favorites.some(fav => fav.id === item.id); // Check if item is in favorites
+
+  const handleFavoriteToggle = () => {
+    if (isFavorite) {
+      removeFromFavorites(item.id); // Remove from favorites if already added
+    } else {
+      addToFavorites(item); // Add to favorites if not already added
+
+    }
+  };
+
+  const renderColorItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.selectColorContainer,
+        item.colorValue === selectedColor && {
+          borderColor: colors.purple,
+          backgroundColor: item.colorValue === selectedColor ? colors.lavendar : 'transparent',
+        },
+      ]}
+      onPress={() => setSelectedColor(item.colorValue)}
+    >
+      <View
+        style={[
+          styles.circleColor,
+          {
+            backgroundColor: item.colorValue,
+          },
+        ]}
+      />
+      <Text style={styles.colorText}>{item.colorName}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderTab = (tabName) => (
+    <TouchableOpacity onPress={() => setSelectedTab(tabName)}>
+      <Text
+        style={[
+          styles.tabText,
+          selectedTab === tabName && { color: colors.purple },
+        ]}
+      >
+        {tabName}
+      </Text>
+      {selectedTab === tabName && <View style={styles.underline} />}
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollViewContainer}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollViewContainer} showsVerticalScrollIndicator={false}>
         <Header />
         <ProductCarousel images={item.images} />
 
-        {/* contnet stuff */}
+        {/* Product Title and Brand */}
         <View style={styles.titleContainer}>
-          {/* title wrapper */}
           <View style={styles.titleWrapper}>
             <Text style={styles.productTitle}>{item.name}</Text>
             <Text style={styles.brand}>{item.brand}</Text>
           </View>
 
-          {/* rating wrapper */}
+          {/* Rating */}
           <View style={styles.ratingWrapper}>
             <AntDesign name={"star"} color={colors.yellow} size={iconSize.sm} />
             <Text style={styles.ratingValue}>4.5</Text>
           </View>
         </View>
 
-        {/* color contaienr */}
+        {/* Color Selection */}
         <View style={styles.colorContainer}>
           <Text style={styles.colorHeading}>Colors</Text>
-          {/* inside this view we gonna rendr all the colors card */}
           <FlatList
             data={colorsData}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[
-                  styles.selectColorContainer,
-                  item.colorValue === selectedColor && {
-                    borderColor: colors.purple,
-                  },
-                ]}
-                onPress={() => {
-                  setSelectedColor(item.colorValue);
-                }}
-              >
-                <View
-                  style={[
-                    styles.circleColor,
-                    {
-                      backgroundColor: item.colorValue,
-                    },
-                  ]}
-                />
-                <Text style={styles.colorText}>{item.colorName}</Text>
-              </TouchableOpacity>
-            )}
+            renderItem={renderColorItem}
             horizontal
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  padding: spacing.sm,
-                }}
-              />
-            )}
+            ItemSeparatorComponent={() => <View style={{ padding: spacing.sm }} />}
           />
         </View>
 
-        {/* details and review  */}
+        {/* Details and Review Tabs */}
         <View style={styles.detailsReviewTabs}>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedTab("Details");
-            }}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab == "Details" && { color: colors.purple },
-              ]}
-            >
-              Details
-            </Text>
-            {selectedTab === "Details" && <View style={styles.underline} />}
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setSelectedTab("Review");
-            }}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab === "Review" && { color: colors.purple },
-              ]}
-            >
-              Review
-            </Text>
-            {selectedTab === "Review" && <View style={styles.underline} />}
-          </TouchableOpacity>
+          {renderTab("Details")}
+          {renderTab("Review")}
         </View>
 
         <Text style={styles.detailsContent}>
           {selectedTab === "Details" ? item.details : item.review}
         </Text>
-      </ScrollView>
-      {/*add to cart button  */}
-      <CartButton item={item} />
 
+        {/* Favorite Button */}
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={handleFavoriteToggle}
+        >
+          <AntDesign
+            name={isFavorite ? "heart" : "hearto"}
+            size={iconSize.lg}
+            color={isFavorite ? colors.purple : colors.gray}
+          />
+          <Text style={styles.favoriteText}>
+            {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      {/* Add to Cart Button */}
+      <CartButton item={item} />
     </View>
   );
 };
@@ -161,6 +172,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flexDirection: "row",
+    marginBottom: spacing.md,
   },
   titleWrapper: {
     flex: 1,
@@ -243,5 +255,17 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     paddingVertical: spacing.xs,
     paddingBottom: 200,
+  },
+  favoriteButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  favoriteText: {
+    fontSize: fontSize.sm,
+    fontFamily: fontFamily.Medium,
+    color: colors.purple,
   },
 });
