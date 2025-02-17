@@ -7,6 +7,7 @@ import HomeScreen from "../src/screen/HomeScreen";
 import CartScreen from "../src/screen/CartScreen";
 import LikedScreen from "../src/screen/LikedScreen";
 import AccountScreen from "../src/screen/AccountScreen";
+// import SignUpScreen from "../src/screen/SignUpScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -48,6 +49,7 @@ const BottomTabNavigator = () => {
       <Tab.Screen name="Cart" component={CartScreen} />
       <Tab.Screen name="Liked" component={LikedScreen} />
       <Tab.Screen name="Account" component={AccountScreen} />
+      {/* <Tab.Screen name="SignUp" component={SignUpScreen} /> */}
     </Tab.Navigator>
   );
 };

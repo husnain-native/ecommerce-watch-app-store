@@ -1,24 +1,47 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import { useNavigation } from '@react-navigation/native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useState } from "react";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import { useNavigation } from "@react-navigation/native";
 
-const AccountScreen = () => {
+const SignUpScreen = () => {
+  const navigation = useNavigation(); // Access navigation
   const [secureEntry, setSecureEntry] = useState(true);
-  const navigation = useNavigation();
-
-  const handleSignup = () => {
-    navigation.navigate("SIGNUP");
-  };
 
   return (
     <View style={styles.container}>
+      {/* Back Arrow */}
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={24} color="#333" />
+      </TouchableOpacity>
+
+      {/* Sign Up Header */}
       <View style={styles.textContainer}>
-        <Text style={styles.headingText}>Login</Text>
+        <Text style={styles.headingText}>Sign Up</Text>
       </View>
 
+      {/* Form Section */}
       <View style={styles.formContainer}>
+        {/* Name Input */}
+        <View style={styles.inputContainer}>
+          <Ionicons name="person-outline" size={24} color="#555" />
+          <TextInput
+            style={styles.inputText}
+            placeholder="Enter Your Name"
+            placeholderTextColor="#888"
+          />
+        </View>
+
+        {/* Email Input */}
         <View style={styles.inputContainer}>
           <Ionicons name="mail-outline" size={24} color="#555" />
           <TextInput
@@ -29,6 +52,7 @@ const AccountScreen = () => {
           />
         </View>
 
+        {/* Password Input */}
         <View style={styles.inputContainer}>
           <SimpleLineIcons name="lock" size={24} color="#555" />
           <TextInput
@@ -46,26 +70,16 @@ const AccountScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity>
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+        {/* Sign Up Button */}
+        <TouchableOpacity style={styles.signupButtonWrapper}>
+          <Text style={styles.signupText}>Sign Up</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={styles.loginButtonWrapper}>
-          <Text style={styles.loginText}>Login</Text>
-        </TouchableOpacity>
-
-        <View style={styles.footerContainer}>
-          <Text style={styles.accountText}>Don’t have an account?</Text>
-          <TouchableOpacity onPress={handleSignup}>
-            <Text style={styles.signupText}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </View>
   );
 };
 
-export default AccountScreen;
+export default SignUpScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -73,6 +87,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8f9fa",
     padding: 20,
     justifyContent: "center",
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    zIndex: 10,
   },
   textContainer: {
     marginBottom: 20,
@@ -102,38 +122,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  forgotPasswordText: {
-    textAlign: "right",
-    color: "#007bff",
-    fontWeight: "500",
-    marginBottom: 20,
-  },
-  loginButtonWrapper: {
+  signupButtonWrapper: {
     backgroundColor: "#007bff",
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: "center",
-    marginBottom: 20,
+    marginTop: 20,
   },
-  loginText: {
+  signupText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
-  },
-  footerContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  accountText: {
-    color: "#333",
-    fontSize: 14,
-  },
-  signupText: {
-    color: "#007bff",
-    fontWeight: "bold",
-    fontSize: 14,
-    marginLeft: 5,
   },
 });
