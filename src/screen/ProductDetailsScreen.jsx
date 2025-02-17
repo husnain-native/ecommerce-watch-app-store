@@ -24,8 +24,7 @@ import CartButton from "../components/CartButton";
 
 // FavoritesContext
 import { FavoritesContext } from "../context/FavoritesContext";
-import { useFavorites } from '../context/FavoritesContext';
-
+import { useFavorites } from "../context/FavoritesContext";
 
 // Mock Data for Colors
 const colorsData = [
@@ -41,22 +40,22 @@ const colorsData = [
     colorName: "Starlight",
     colorValue: "#FAF6F2",
   },
+
 ];
 
 const ProductDetailsScreen = () => {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedTab, setSelectedTab] = useState("Details");
   const item = useRoute().params.item; // Retrieve item from route params
-  const { addToFavorites, removeFromFavorites, favorites } = useFavorites();; // Access favorites context
+  const { addToFavorites, removeFromFavorites, favorites } = useFavorites(); // Access favorites context
 
-  const isFavorite = favorites.some(fav => fav.id === item.id); // Check if item is in favorites
+  const isFavorite = favorites.some((fav) => fav.id === item.id); // Check if item is in favorites
 
   const handleFavoriteToggle = () => {
     if (isFavorite) {
       removeFromFavorites(item.id); // Remove from favorites if already added
     } else {
       addToFavorites(item); // Add to favorites if not already added
-
     }
   };
 
@@ -66,7 +65,7 @@ const ProductDetailsScreen = () => {
         styles.selectColorContainer,
         item.colorValue === selectedColor && {
           borderColor: colors.purple,
-          backgroundColor: item.colorValue === selectedColor ? colors.lavendar : 'transparent',
+          backgroundColor: item.colorValue === selectedColor ? colors.lavendar : "transparent",
         },
       ]}
       onPress={() => setSelectedColor(item.colorValue)}
@@ -85,12 +84,7 @@ const ProductDetailsScreen = () => {
 
   const renderTab = (tabName) => (
     <TouchableOpacity onPress={() => setSelectedTab(tabName)}>
-      <Text
-        style={[
-          styles.tabText,
-          selectedTab === tabName && { color: colors.purple },
-        ]}
-      >
+      <Text style={[styles.tabText, selectedTab === tabName && { color: colors.purple }]}>
         {tabName}
       </Text>
       {selectedTab === tabName && <View style={styles.underline} />}
@@ -137,30 +131,22 @@ const ProductDetailsScreen = () => {
         <Text style={styles.detailsContent}>
           {selectedTab === "Details" ? item.details : item.review}
         </Text>
-
-        {/* Favorite Button */}
-        <TouchableOpacity
-          style={styles.favoriteButton}
-          onPress={handleFavoriteToggle}
-        >
-          <AntDesign
-            name={isFavorite ? "heart" : "hearto"}
-            size={iconSize.lg}
-            color={isFavorite ? colors.purple : colors.gray}
-          />
-          <Text style={styles.favoriteText}>
-            {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-          </Text>
-        </TouchableOpacity>
       </ScrollView>
 
       {/* Add to Cart Button */}
       <CartButton item={item} />
+
+      {/* Favorite Button */}
+      <TouchableOpacity style={styles.favoriteButton} onPress={handleFavoriteToggle}>
+        <AntDesign
+          name={isFavorite ? "heart" : "hearto"}
+          size={iconSize.lg}
+          color={isFavorite ? 'red' : colors.gray}
+        />
+      </TouchableOpacity>
     </View>
   );
 };
-
-export default ProductDetailsScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -169,6 +155,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     padding: spacing.md,
+    position: "relative", // Added to allow absolute positioning within this container
   },
   titleContainer: {
     flexDirection: "row",
@@ -257,15 +244,14 @@ const styles = StyleSheet.create({
     paddingBottom: 200,
   },
   favoriteButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-  },
-  favoriteText: {
-    fontSize: fontSize.sm,
-    fontFamily: fontFamily.Medium,
-    color: colors.purple,
+    position: "absolute",
+    top: spacing.md,
+    right: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: 25,
+    padding: spacing.sm,
+    zIndex: 1, // Make sure it stays on top of other content
   },
 });
+
+export default ProductDetailsScreen;

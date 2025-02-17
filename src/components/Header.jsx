@@ -16,7 +16,7 @@ const Header = () => {
       </TouchableOpacity>
 
       {/* Heart icon button */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => {
           setIsFavorite(!isFavorite); // Toggle favorite state
         }}
@@ -26,7 +26,7 @@ const Header = () => {
           size={iconSize.lg}
           color={isFavorite ? "red" : "black"} // Red when filled, black when outlined
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };
