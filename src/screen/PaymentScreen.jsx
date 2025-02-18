@@ -1,19 +1,42 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Switch, Modal } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image, Switch, Modal, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { colors } from "../constants/colors";
+import { useCart } from "../context/CartContext";
+
 
 const PaymentScreen = () => {
   const navigation = useNavigation();
+  console.log('Navigating to PaymentScreen');
+
+  const cartContext = useCart();
+  console.log('CartContext in PaymentScreen:', cartContext);
+  
+  const { cartItems = [] } = cartContext || {};
+  console.log('Cart items in PaymentScreen:', cartItems);
+  console.log('Navigation state:', navigation.getState());
+
+
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvv, setCvv] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
 
+  // Calculate total from cart items
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + (item?.price || 0), 0).toFixed(2);
+  };
+
+
+
   const handlePayment = () => {
+    console.log('Payment initiated with:', { cardNumber, expiryDate, cvv });
+    console.log('Current cart items:', cartItems);
+    console.log('Navigation state:', navigation.getState());
+
+
     if (!cardNumber || cardNumber.length < 16) {
       alert("Please enter a valid 16-digit card number.");
       return;
@@ -36,12 +59,13 @@ const PaymentScreen = () => {
         <Ionicons name={"arrow-back"} size={34} color="#000" />
       </TouchableOpacity>
       <Text style={styles.heading}>Payment Details</Text>
-
+  
+      {/* Payment Form */}
       <View style={styles.inputWrapper}>
         <Text style={styles.label}>Name on Card</Text>
         <TextInput style={styles.input} placeholder="Name" placeholderTextColor="#888" />
       </View>
-
+  
       <View style={styles.inputWrapper}>
         <Text style={styles.label}>Card Information</Text>
         <View style={styles.cardInfoContainer}>
@@ -66,7 +90,7 @@ const PaymentScreen = () => {
           </View>
         </View>
       </View>
-
+  
       <View style={styles.cardInfoRow}>
         <TextInput
           style={[styles.input, { flex: 1, marginRight: 8 }]}
@@ -94,47 +118,59 @@ const PaymentScreen = () => {
           value={cvv}
         />
       </View>
-
+  
       <View style={styles.checkboxWrapper}>
         <Switch value={isSaved} onValueChange={setIsSaved} />
         <Text style={styles.checkboxLabel}>Save this card for future payments</Text>
       </View>
-
+  
       <TouchableOpacity style={styles.payButton} onPress={handlePayment}>
         <Text style={styles.payButtonText}>Pay Now</Text>
       </TouchableOpacity>
-
+  
+      {/* Cart Items List */}
+      <ScrollView style={styles.itemsList}>
+        {cartItems.map((item) => (
+          <View key={item.id} style={styles.itemRow}>
+            <Text style={styles.itemName}>{item.brand} {item.name}</Text>
+            <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+          </View>
+        ))}
+      </ScrollView>
+  
+      <Text style={styles.grandTotalLabel}>Grand Total: ${calculateTotal()}</Text>
+  
+      {/* Payment Success Modal */}
       <Modal
-  visible={isPaymentSuccess}
-  transparent={true}
-  animationType="slide"
-  onRequestClose={() => setIsPaymentSuccess(false)}
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      {/* Close Button */}
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => setIsPaymentSuccess(false)}
+        visible={isPaymentSuccess}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsPaymentSuccess(false)}
       >
-        <Ionicons name="close" size={24} color= {colors.gray} />
-      </TouchableOpacity>
-
-      <Ionicons name="checkmark-circle" size={64} color="#4CAF50" />
-      <Text style={styles.modalTitle}>Payment Successful!</Text>
-      <Text style={styles.modalMessage}>Thank you for your purchase.</Text>
-      <TouchableOpacity
-        style={styles.modalButton}
-        onPress={() => {
-          setIsPaymentSuccess(false);
-          navigation.navigate("HOME");
-        }}
-      >
-        <Text style={styles.modalButtonText}>Go to Home</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsPaymentSuccess(false)}
+            >
+              <Ionicons name="close" size={24} color="#777" />
+            </TouchableOpacity>
+  
+            <Ionicons name="checkmark-circle" size={64} color="#4CAF50" />
+            <Text style={styles.modalTitle}>Payment Successful!</Text>
+            <Text style={styles.modalMessage}>Thank you for your purchase.</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                setIsPaymentSuccess(false);
+                navigation.navigate("HOME");
+              }}
+            >
+              <Text style={styles.modalButtonText}>Go to Home</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -157,6 +193,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
   },
+
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginVertical: 12,
+    textAlign: "center",
+  },
   inputWrapper: {
     marginBottom: 16,
   },
@@ -166,6 +209,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: "#000",
   },
+ 
+  itemPrice: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#4CAF50",
+    textAlign: "right", // Align price to the right
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ddd",
@@ -174,6 +224,50 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: "#fff",
     color: "#000",
+  },
+  itemsList: {
+    marginVertical: 16,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5, // For Android shadow
+  },
+  itemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingVertical: 8,
+  },
+  itemName: {
+    fontSize: 14, // Reduced text size
+    fontWeight: "500",
+    color: "#333",
+    maxWidth: "70%", // To make sure text doesn't overflow
+  },
+  itemPrice: {
+    fontSize: 14, // Reduced text size
+    fontWeight: "bold",
+    color: "#4CAF50",
+    textAlign: "right", // Align price to the right
+  },
+  grandTotalLabel: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+    marginTop: 16,
+    textAlign: "center",
+    paddingTop: 10,
+    paddingBottom: 10,
+    backgroundColor: "#284d38",
+    borderRadius: 10,
+    marginBottom: 16,
   },
   cardInfoContainer: {
     flexDirection: "row",
@@ -235,7 +329,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
-    position: "relative", 
+    position: "relative",
   },
   modalTitle: {
     fontSize: 24,
@@ -266,6 +360,5 @@ const styles = StyleSheet.create({
     right: 8,
     zIndex: 1,
     padding: 8,
-    color: colors.gray
   },
 });
